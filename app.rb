@@ -5,19 +5,18 @@ require 'csv'
 set :bind, '0.0.0.0'
 set :port, ENV['PORT'] || 4567
 
-DB_FILE = File.join(settings.root, 'db.sqlite3')
+DB_FILE = 'romance_db.sqlite3'
 
 helpers do
   def db_connection
-    SQLite3::Database.new(DB_FILE).tap do |db|
-      db.results_as_hash = true
-    end
+    SQLite3::Database.new(DB_FILE)
   end
 end
 
 # DB初期化（最初だけ）
 configure do
-  db = db_connection
+  db = SQLite3::Database.new(DB_FILE)
+  db.results_as_hash = true
   db.execute <<-SQL
     CREATE TABLE IF NOT EXISTS answers (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -45,7 +44,6 @@ get '/' do
 end
 
 post '/submit' do
-  # 管理者ログイン用の特殊誕生日
   if params['partner_birthday'] == '2100-01-01'
     redirect '/admin_login'
   end
@@ -62,6 +60,7 @@ post '/submit' do
   fortune_message = fortunes.sample
 
   db = db_connection
+  db.results_as_hash = true
   db.execute(
     "INSERT INTO answers
      (name, partner_name, relationship_duration, liked_points, improve_points, message,
@@ -76,11 +75,13 @@ post '/submit' do
   )
   last_id = db.last_insert_row_id
   db.close
+
   redirect "/result/#{last_id}"
 end
 
 get '/result/:id' do
   db = db_connection
+  db.results_as_hash = true
   @answer = db.get_first_row("SELECT * FROM answers WHERE id=?", [params[:id]])
   db.close
   halt 404, "結果が見つかりません" unless @answer
@@ -88,6 +89,7 @@ get '/result/:id' do
   erb :result
 end
 
+# 以下、管理者機能も SQLite に合わせて修正
 get '/admin_login' do
   @title = "管理者ログイン"
   erb :admin_login
@@ -105,9 +107,10 @@ end
 
 get '/admin' do
   db = db_connection
+  db.results_as_hash = true
   if params[:search] && !params[:search].empty?
     keyword = "%#{params[:search]}%"
-    @answers = db.execute("SELECT * FROM answers WHERE name LIKE ? OR partner_name LIKE ? ORDER BY created_at DESC", [keyword, keyword])
+    @answers = db.execute("SELECT * FROM answers WHERE name LIKE ? OR partner_name LIKE ? ORDER BY created_at DESC", keyword, keyword)
   else
     @answers = db.execute("SELECT * FROM answers ORDER BY created_at DESC")
   end
@@ -132,6 +135,7 @@ end
 
 get '/admin/export' do
   db = db_connection
+  db.results_as_hash = true
   data = db.execute("SELECT * FROM answers")
   db.close
 
@@ -143,5 +147,6 @@ get '/admin/export' do
     data.each { |row| csv << row.values }
   end
 end
+
 
 
