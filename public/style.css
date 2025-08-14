@@ -1,0 +1,169 @@
+/* 全体背景とフォント */
+body {
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  background: linear-gradient(135deg, #ff9a9e 0%, #fad0c4 100%);
+  margin: 0;
+  padding: 0;
+  color: #333;
+  position: relative;
+  overflow-x: hidden;
+}
+
+/* 背景ハートをアニメーションで浮遊 */
+@keyframes floatHeart {
+  0% { transform: translateY(100vh) rotate(0deg); opacity: 0.7; }
+  100% { transform: translateY(-10vh) rotate(360deg); opacity: 0; }
+}
+
+.heart {
+  position: absolute;
+  font-size: 1.5em;
+  color: #ff69b4;
+  animation: floatHeart 10s linear infinite;
+  user-select: none;
+  pointer-events: none;
+}
+
+/* 見出し */
+h1 {
+  text-align: center;
+  color: #fff;
+  text-shadow: 2px 2px 5px #ff69b4;
+  padding: 20px 0;
+  position: relative;
+}
+
+/* フォーム全体 */
+form {
+  max-width: 600px;
+  margin: 20px auto;
+  background: rgba(255, 255, 255, 0.9);
+  padding: 20px;
+  border-radius: 15px;
+  box-shadow: 0 4px 10px rgba(255, 0, 100, 0.2);
+  position: relative;
+}
+
+/* ラベル */
+label {
+  display: block;
+  margin-top: 15px;
+  font-weight: bold;
+  color: #ff1493;
+}
+
+/* テキスト入力、日付、textarea */
+input[type="text"],
+input[type="date"],
+textarea {
+  width: 100%;
+  padding: 8px;
+  border: 2px solid #ff69b4;
+  border-radius: 8px;
+  margin-top: 5px;
+  box-sizing: border-box;
+}
+
+/* テキストエリアの高さ */
+textarea {
+  min-height: 50px;
+  resize: vertical;
+}
+
+/* 送信ボタン */
+input[type="submit"] {
+  margin-top: 20px;
+  width: 100%;
+  padding: 10px;
+  background: linear-gradient(to right, #ff6a6a, #ff1493);
+  border: none;
+  border-radius: 25px;
+  color: #fff;
+  font-size: 1.2em;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+input[type="submit"]:hover {
+  background: linear-gradient(to right, #ff1493, #ff6a6a);
+  transform: scale(1.05);
+}
+
+/* 送信ボタンにハートアイコン */
+input[type="submit"]::after {
+  content: "💖";
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 1.2em;
+  animation: floatHeart 2s linear infinite;
+}
+
+/* 診断結果 */
+.fortune {
+  max-width: 700px;
+  margin: 20px auto;
+  padding: 20px;
+  background: linear-gradient(to right, #ffe6f0, #fff0f5);
+  border-radius: 15px;
+  box-shadow: 0 4px 15px rgba(255, 0, 100, 0.2);
+  font-size: 1.8em;
+  line-height: 1.8em;
+  text-align: center;
+  position: relative;
+}
+
+/* 管理者画面テーブル */
+table {
+  width: 95%;
+  margin: 20px auto;
+  border-collapse: collapse;
+  table-layout: fixed;
+  word-wrap: break-word;
+  font-size: 0.8em;
+}
+
+th, td {
+  border: 1px solid #ff69b4;
+  padding: 5px;
+  text-align: left;
+}
+
+th {
+  background: #ffb6c1;
+  color: #fff;
+}
+
+/* スクロール */
+table {
+  display: block;
+  max-height: 500px;
+  overflow-y: auto;
+}
+
+/* リンク */
+a {
+  display: inline-block;
+  margin: 10px auto;
+  text-decoration: none;
+  color: #ff1493;
+  font-weight: bold;
+}
+
+a:hover {
+  color: #ff69b4;
+}
+
+/* レスポンシブ */
+@media screen and (max-width: 768px) {
+  form, .fortune, table {
+    width: 90%;
+  }
+  input[type="submit"] {
+    font-size: 1em;
+  }
+}
+

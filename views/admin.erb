@@ -1,0 +1,61 @@
+<h1><%= @title %></h1>
+<link rel="stylesheet" href="/style.css">
+
+<form method="get" action="/admin">
+  <input type="text" name="search" placeholder="名前・彼氏名で検索" value="<%= params[:search] %>">
+  <input type="submit" value="検索">
+</form>
+
+<table border="1" style="width:100%; font-size:0.8em; table-layout:fixed; word-wrap:break-word;">
+  <tr>
+    <th>ID</th>
+    <th>名前</th>
+    <th>彼氏名</th>
+    <th>期間</th>
+    <th>好きなところ</th>
+    <th>改善点</th>
+    <th>メッセージ</th>
+    <th>欲しい物</th>
+    <th>やりたいこと</th>
+    <th>嬉しいこと</th>
+    <th>誕生日</th>
+    <th>出会い</th>
+    <th>メモ</th>
+    <th>作成日</th>
+    <th>操作</th>
+  </tr>
+  <% @answers.each do |a| %>
+    <tr>
+      <td><%= a['id'] %></td>
+      <td><%= a['name'] %></td>
+      <td><%= a['partner_name'] %></td>
+      <td><%= a['relationship_duration'] %></td>
+      <td><%= a['liked_points'] %></td>
+      <td><%= a['improve_points'] %></td>
+      <td><%= a['message'] %></td>
+      <td><%= a['desired_gift'] %></td>
+      <td><%= a['desired_activity'] %></td>
+      <td><%= a['happy_things'] %></td>
+      <td><%= a['partner_birthday'] %></td>
+      <td><%= a['meeting_story'] %></td>
+      <td>
+        <form action="/update_memo/<%= a['id'] %>" method="post">
+          <textarea name="memo" style="width:100%; height:60px;"><%= a['memo'] %></textarea>
+          <input type="submit" value="更新">
+        </form>
+      </td>
+      <td><%= a['created_at'] %></td>
+      <td>
+        <form action="/delete/<%= a['id'] %>" method="post" onsubmit="return confirm('削除しますか？');">
+          <input type="submit" value="削除">
+        </form>
+      </td>
+    </tr>
+  <% end %>
+</table>
+
+<a href="/admin/export">CSV出力</a>
+<br>
+<a href="/">アンケートに戻る</a>
+
+

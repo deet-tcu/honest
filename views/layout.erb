@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title><%= @title || "SintarA 恋愛診断" %></title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <% 15.times do %>
+    <div class="heart" style="left:<%= rand(0..100) %>%; font-size:<%= rand(15..30) %>px; animation-delay:<%= rand(0..8) %>s;">❤️</div>
+  <% end %>
+  <%= yield %>
+</body>
+</html>

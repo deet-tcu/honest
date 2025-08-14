@@ -1,0 +1,44 @@
+<h1>恋愛診断アンケート💌</h1>
+<link rel="stylesheet" href="/style.css">
+
+<% if @error %>
+  <p style="color:red;"><%= @error %></p>
+<% end %>
+
+<form action="/submit" method="post">
+  <label>①あなたの名前は？</label>
+  <input type="text" name="name">
+
+  <label>②彼氏、好きぴの名前は？</label>
+  <input type="text" name="partner_name">
+
+  <label>③好きになって、もしくは付き合ってどのくらい？</label>
+  <input type="text" name="relationship_duration">
+
+  <label>④どんなところが好き？</label>
+  <textarea name="liked_points"></textarea>
+
+  <label>⑤直して欲しいところ</label>
+  <textarea name="improve_points"></textarea>
+
+  <label>⑥彼氏に言いたいこと</label>
+  <textarea name="message"></textarea>
+
+  <label>⑦欲しいプレゼント</label>
+  <textarea name="desired_gift"></textarea>
+
+  <label>⑧今したいこと</label>
+  <textarea name="desired_activity"></textarea>
+
+  <label>⑨されて嬉しいこと</label>
+  <textarea name="happy_things"></textarea>
+
+  <label>⑩彼氏の誕生日</label>
+  <input type="date" name="partner_birthday">
+
+  <label>⑪出会いのエピソード</label>
+  <textarea name="meeting_story"></textarea>
+
+  <input type="submit" value="診断する">
+</form>
+

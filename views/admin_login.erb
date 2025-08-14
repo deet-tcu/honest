@@ -1,0 +1,11 @@
+<h1>管理者ログイン🔐</h1>
+<link rel="stylesheet" href="/style.css">
+
+<% if @error %>
+  <p style="color:red; text-align:center;"><%= @error %></p>
+<% end %>
+<form action="/admin_login" method="post">
+  <label>パスワード</label>
+  <input type="text" name="password">
+  <input type="submit" value="ログイン">
+</form>
