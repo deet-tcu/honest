@@ -23,10 +23,12 @@ GEM
       rack-session (>= 2.0.0, < 3)
       tilt (~> 2.0)
     sqlite3 (2.7.3-x64-mingw-ucrt)
+    sqlite3 (2.7.3-x86_64-linux-gnu)
     tilt (2.6.1)
 
 PLATFORMS
   x64-mingw-ucrt
+  x86_64-linux
 
 DEPENDENCIES
   csv
