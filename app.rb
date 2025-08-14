@@ -5,7 +5,7 @@ require 'erb'
 
 # データベース接続用メソッド
 def db_connection
-  PG.connect(ENV['DATABASE_URL'])
+  conn = PG.connect(ENV['DATABASE_URL'])
 end
 
 # 初期化：テーブルがなければ作る
