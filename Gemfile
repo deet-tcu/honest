@@ -10,3 +10,5 @@ gem "csv"
 gem 'puma'
 gem 'rack'
 
+
+gem "rackup", "~> 2.2"
