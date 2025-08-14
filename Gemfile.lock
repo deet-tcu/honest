@@ -6,6 +6,9 @@ GEM
     logger (1.7.0)
     mustermann (3.0.4)
       ruby2_keywords (~> 0.0.1)
+    nio4r (2.7.4)
+    puma (6.6.1)
+      nio4r (~> 2.0)
     rack (3.2.0)
     rack-protection (4.1.1)
       base64 (>= 0.1.0)
@@ -32,6 +35,8 @@ PLATFORMS
 
 DEPENDENCIES
   csv
+  puma
+  rack
   sinatra
   sqlite3
 
