@@ -1,19 +1,26 @@
-# app.rb (PostgreSQL用)
 require 'sinatra'
-require 'pg'
-require 'erb'
+require 'sqlite3'
+require 'csv'
 
-# データベース接続用メソッド
-def db_connection
-  conn = PG.connect(ENV['DATABASE_URL'])
+set :bind, '0.0.0.0'
+set :port, ENV['PORT'] || 4567
+
+DB_FILE = File.join(settings.root, 'db.sqlite3')
+
+helpers do
+  def db_connection
+    SQLite3::Database.new(DB_FILE).tap do |db|
+      db.results_as_hash = true
+    end
+  end
 end
 
-# 初期化：テーブルがなければ作る
+# DB初期化（最初だけ）
 configure do
-  conn = db_connection
-  conn.exec <<-SQL
+  db = db_connection
+  db.execute <<-SQL
     CREATE TABLE IF NOT EXISTS answers (
-      id SERIAL PRIMARY KEY,
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
       name TEXT,
       partner_name TEXT,
       relationship_duration TEXT,
@@ -23,77 +30,118 @@ configure do
       desired_gift TEXT,
       desired_activity TEXT,
       happy_things TEXT,
-      partner_birthday DATE,
+      partner_birthday TEXT,
       meeting_story TEXT,
-      memo TEXT,
-      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      memo TEXT DEFAULT '',
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
     );
   SQL
-  conn.close
+  db.close
 end
 
-# トップページ（アンケートフォーム）
 get '/' do
+  @title = "恋愛診断アンケート"
   erb :index
 end
 
-# フォーム送信
 post '/submit' do
-  fortune_message = "こうしたらもっと仲良くなれるかも！"
+  # 管理者ログイン用の特殊誕生日
+  if params['partner_birthday'] == '2100-01-01'
+    redirect '/admin_login'
+  end
 
-  conn = db_connection
-  conn.exec_params(
+  fortunes = [
+    "今週は、二人の心がますます寄り添う予感。🌙",
+    "思いがけないサプライズが二人の距離を縮めます。🎁",
+    "笑顔を絶やさないことで愛が深まります。😊",
+    "今日は#{params['partner_name']}さんに優しい言葉をかけてみて。💌",
+    "星が二人を見守っています。夜空を一緒に眺めてみては？✨",
+    "少しの我慢が、永遠の幸せをもたらします。💖",
+    "一緒に新しいことを始めると愛が加速します。🚀"
+  ]
+  fortune_message = fortunes.sample
+
+  db = db_connection
+  db.execute(
     "INSERT INTO answers
-     (name, partner_name, relationship_duration, liked_points, improve_points, message, desired_gift, desired_activity, happy_things, partner_birthday, meeting_story, memo)
-     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12)
-     RETURNING id",
+     (name, partner_name, relationship_duration, liked_points, improve_points, message,
+      desired_gift, desired_activity, happy_things, partner_birthday, meeting_story, memo)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
     [
       params['name'], params['partner_name'], params['relationship_duration'],
       params['liked_points'], params['improve_points'], params['message'],
       params['desired_gift'], params['desired_activity'], params['happy_things'],
       params['partner_birthday'], params['meeting_story'], fortune_message
     ]
-  ) do |result|
-    @last_id = result[0]['id']
-  end
-  conn.close
-
-  redirect "/result/#{@last_id}"
+  )
+  last_id = db.last_insert_row_id
+  db.close
+  redirect "/result/#{last_id}"
 end
 
-# 結果表示ページ
 get '/result/:id' do
-  conn = db_connection
-  @answer = conn.exec_params("SELECT * FROM answers WHERE id=$1", [params[:id]])[0]
-  conn.close
+  db = db_connection
+  @answer = db.get_first_row("SELECT * FROM answers WHERE id=?", [params[:id]])
+  db.close
+  halt 404, "結果が見つかりません" unless @answer
+  @title = "診断結果"
   erb :result
 end
 
-# 管理者ページ
-get '/admin' do
-  password = params['password'] || ''
-  if password != ENV['ADMIN_PASSWORD']
-    return "パスワードが違います"
+get '/admin_login' do
+  @title = "管理者ログイン"
+  erb :admin_login
+end
+
+post '/admin_login' do
+  if params[:password] == "2109"
+    redirect '/admin'
+  else
+    @error = "パスワードが違います"
+    @title = "管理者ログイン"
+    erb :admin_login
   end
-  conn = db_connection
-  @answers = conn.exec("SELECT * FROM answers ORDER BY created_at DESC").to_a
-  conn.close
+end
+
+get '/admin' do
+  db = db_connection
+  if params[:search] && !params[:search].empty?
+    keyword = "%#{params[:search]}%"
+    @answers = db.execute("SELECT * FROM answers WHERE name LIKE ? OR partner_name LIKE ? ORDER BY created_at DESC", [keyword, keyword])
+  else
+    @answers = db.execute("SELECT * FROM answers ORDER BY created_at DESC")
+  end
+  db.close
+  @title = "管理画面"
   erb :admin
 end
 
-# 削除機能（管理者専用）
-post '/delete/:id' do
-  password = params['password'] || ''
-  if password != ENV['ADMIN_PASSWORD']
-    return "パスワードが違います"
-  end
-  conn = db_connection
-  conn.exec_params("DELETE FROM answers WHERE id=$1", [params[:id]])
-  conn.close
-  redirect "/admin?password=#{password}"
+post '/update_memo/:id' do
+  db = db_connection
+  db.execute("UPDATE answers SET memo=? WHERE id=?", [params[:memo], params[:id]])
+  db.close
+  redirect '/admin'
 end
 
-# Render対応のポート設定
-set :port, ENV.fetch('PORT', 4567)
-set :bind, '0.0.0.0'
+post '/delete/:id' do
+  db = db_connection
+  db.execute("DELETE FROM answers WHERE id=?", [params[:id]])
+  db.close
+  redirect '/admin'
+end
+
+get '/admin/export' do
+  db = db_connection
+  data = db.execute("SELECT * FROM answers")
+  db.close
+
+  content_type 'application/csv'
+  attachment "answers.csv"
+
+  CSV.generate do |csv|
+    csv << ["ID", "名前", "彼氏名", "期間", "好きなところ", "改善点", "メッセージ", "欲しい物", "やりたいこと", "嬉しいこと", "誕生日", "出会い", "メモ", "作成日"]
+    data.each { |row| csv << row.values }
+  end
+end
+
 

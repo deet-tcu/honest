@@ -1,5 +1,9 @@
-source 'https://rubygems.org'
+# frozen_string_literal: true
 
-gem 'sinatra'
-gem 'sqlite3'
-gem 'csv'
+source "https://rubygems.org"
+
+ruby "3.4.4"
+
+gem "sinatra"
+gem "sqlite3"
+gem "csv"
