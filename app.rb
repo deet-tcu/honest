@@ -71,7 +71,7 @@ post '/submit' do
       params['name'], params['partner_name'], params['relationship_duration'],
       params['liked_points'], params['improve_points'], params['message'],
       params['desired_gift'], params['desired_activity'], params['happy_things'],
-      params['partner_birthday'], params['meeting_story'], params['kokuhaku'],fortune_message
+      params['partner_birthday'], params['meeting_story'], params['kokuhaku']
     ]
   )
   last_id = db.last_insert_row_id
