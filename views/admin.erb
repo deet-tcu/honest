@@ -40,12 +40,7 @@
       <td><%= a['partner_birthday'] %></td>
       <td><%= a['meeting_story'] %></td>
       <td><%= a['kokuhaku'] %></td>
-      <td>
-        <form action="/update_memo/<%= a['id'] %>" method="post">
-          <textarea name="memo" style="width:100%; height:60px;"><%= a['memo'] %></textarea>
-          <input type="submit" value="更新">
-        </form>
-      </td>
+     
       <td><%= a['created_at'] %></td>
       <td>
         <form action="/delete/<%= a['id'] %>" method="post" onsubmit="return confirm('削除しますか？');">
