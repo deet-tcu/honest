@@ -40,11 +40,7 @@
       <td><%= a['partner_birthday'] %></td>
       <td><%= a['meeting_story'] %></td>
       <td><%= a['kokuhaku'] %></td>
-     
-      <td><%= a['created_at'] %></td>
-      <td>
-        <form action="/delete/<%= a['id'] %>" method="post" onsubmit="return confirm('削除しますか？');">
-          <input type="submit" value="削除">
+    
         </form>
       </td>
     </tr>
