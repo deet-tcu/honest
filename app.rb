@@ -31,6 +31,7 @@ configure do
       happy_things TEXT,
       partner_birthday TEXT,
       meeting_story TEXT,
+      kokuhaku TEXT,
       memo TEXT DEFAULT '',
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP
     );
@@ -64,13 +65,13 @@ post '/submit' do
   db.execute(
     "INSERT INTO answers
      (name, partner_name, relationship_duration, liked_points, improve_points, message,
-      desired_gift, desired_activity, happy_things, partner_birthday, meeting_story, memo)
+      desired_gift, desired_activity, happy_things, partner_birthday, meeting_story, kokuhaku)
      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
     [
       params['name'], params['partner_name'], params['relationship_duration'],
       params['liked_points'], params['improve_points'], params['message'],
       params['desired_gift'], params['desired_activity'], params['happy_things'],
-      params['partner_birthday'], params['meeting_story'], fortune_message
+      params['partner_birthday'], params['meeting_story'], params['kokuhaku'],fortune_message
     ]
   )
   last_id = db.last_insert_row_id
